@@ -5,7 +5,7 @@ class BNode:
     m: int  # Degree: It shows that it can stores at most m children and at most m-1 keys
     keys: list[int]
     is_leaf: bool  # A leaf node is a node without any children.
-    # This is a list containing childrens of the node. If it's a non-leaf node it should have at most m and at least ceil(m/2) child nodes.
+    # This is a list containing children of the node. If it's a non-leaf node it should have at most m and at least ceil(m/2) child nodes.
     tree: object # Whole tree as an object
     parrent: object # Parent of node
     children: list # Children of this node
@@ -23,7 +23,7 @@ class BNode:
         _, ind = self.binary_search(self.keys, k)
         self.keys.insert(ind+1, k)
 
-    def child_insert(self, node): # Insert new child in node. 
+    def child_insert(self, node): # Insert new child in node.
         _, ind = self.binary_search(self.keys, node.keys[0])
         self.children.insert(ind+1, node)
 
@@ -67,8 +67,8 @@ class BNode:
             self.children[-1].traverse()
 
     def search(self, k): # Search for specific key in node
-        is_finded, ind = self.binary_search(self.keys, k)
-        if is_finded:
+        is_found, ind = self.binary_search(self.keys, k)
+        if is_found:
             return self
         if self.is_leaf:
             return None
