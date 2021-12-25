@@ -1,3 +1,6 @@
+'''
+    Implementation of B-Tree with degree m.
+'''
 from math import ceil
 
 
