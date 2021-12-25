@@ -6,18 +6,20 @@ class BNode:
     keys: list[int]
     is_leaf: bool  # A leaf node is a node without any children.
     # This is a list containing childrens of the node. If it's a non-leaf node it should have at most m and at least ceil(m/2) child nodes.
+    tree: object
     parrent: object
     children: list
     # Number of child nodes are greater than number of keys by one.
 
-    def __init__(self, m, parrent=None, is_leaf=True) -> None:
+    def __init__(self, tree, m, parrent=None, is_leaf=True) -> None:
+        self.tree = tree
         self.m = m
         self.keys = []
         self.is_leaf = is_leaf
         self.parrent = parrent
         self.children = []
 
-    def just_insert(self, k):
+    def key_insert(self, k):
         _, ind = self.binary_search(self.keys, k)
         self.keys.insert(ind+1, k)
 
@@ -25,20 +27,28 @@ class BNode:
         _, ind = self.binary_search(self.keys, node.keys[0])
         self.children.insert(ind+1, node)
 
-    # TODO: complete this.
     def balance(self):
         if len(self.keys) > self.m - 1:
             min_key = ceil(self.m / 2) - 1
-            self.parrent.just_insert(self.keys[min_key])
-            k2 = self.keys[min_key+1:]
-            c2 = self.children[min_key+1:] if not self.is_leaf else []
+            promoting_key = self.keys[min_key]
+            new_node = BNode(self.tree, self.m,
+                             parrent=self.parrent, is_leaf=self.is_leaf)
+            new_node.keys = self.keys[min_key+1:]
+            new_node.children = self.children[min_key +
+                                              1:] if not self.is_leaf else []
             self.keys = self.keys[:min_key]
-            self.children = self.children[:min_key+1] if not self.is_leaf else []
-            new_node = BNode(self.m, parrent=self.parrent, is_leaf=self.is_leaf)
-            new_node.keys = k2
-            new_node.children = c2
-            self.parrent.child_insert(new_node)
-            self.parrent.balance()
+            self.children = self.children[:min_key +
+                                          1] if not self.is_leaf else []
+            if self.parrent is not None:
+                self.parrent.key_insert(promoting_key)
+                self.parrent.child_insert(new_node)
+                self.parrent.balance()
+            else:
+                self.parrent = BNode(self.tree, self.m, is_leaf=False)
+                new_node.parrent = self.parrent
+                self.tree.root = self.parrent
+                self.parrent.keys = [promoting_key]
+                self.parrent.children = [self, new_node]
 
     def insert(self, k):
         _, ind = self.binary_search(self.keys, k)
@@ -96,6 +106,9 @@ class BTree:
     def insert(self, k) -> None:
         if self.root is not None:
             self.root.insert(k)
+        else:
+            self.root = BNode(self, self.m, is_leaf=True)
+            self.root.keys = [k]
 
     def delete(self, k) -> None:
         pass
@@ -108,3 +121,6 @@ class BTree:
     def search(self, k) -> BNode:
         if self.root is not None:
             self.root.search(k)
+
+
+bt = BTree(3)
